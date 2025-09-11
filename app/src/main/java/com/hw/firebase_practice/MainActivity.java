@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     EditText eTMail, eTPass;
     TextView tVMsg;
-    Button btnCreateUser;
+    Button btnCreateUser, btnLoginUser;
     private ActivityMainBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +49,9 @@ public class MainActivity extends AppCompatActivity {
         eTPass = binding.eTPass;
         tVMsg = binding.tVMsg;
         btnCreateUser = binding.btnCreateUser;
+        btnLoginUser = binding.btnLoginUser;
         btnCreateUser.setOnClickListener(view -> createUser(view));
+        btnLoginUser.setOnClickListener(view -> loginUser(view));
     }
     public void createUser(View view)
     {
@@ -91,6 +93,64 @@ public class MainActivity extends AppCompatActivity {
                                 } else if (exp instanceof FirebaseNetworkException) {
                                     tVMsg.setText("Network error. Please check your connection.");
                                 } else {
+                                    tVMsg.setText("An error occurred. Please try again later.");
+                                }
+                            }
+                        }
+                    });
+        }
+    }
+    public void loginUser(View view)
+    {
+        String email = eTMail.getText().toString();
+        String pass = eTPass.getText().toString();
+        if(email.isEmpty() || pass.isEmpty())
+        {
+            tVMsg.setText("Please fill all fields");
+        }
+        else {
+            Log.i("MainActivity", "mail: " + email + " pass: " + pass);
+            ProgressDialog pd = new ProgressDialog(this);
+            pd.setTitle("Connecting");
+            pd.setMessage("Login user");
+            pd.show();
+            System.out.println("mail: " + email + " pass: " + pass);
+            FBRef.refAuth.signInWithEmailAndPassword(email, pass)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            pd.dismiss();
+                            if (task.isSuccessful())
+                            {
+                                Log.i("MainActivity", "signInUserWithEmailAndPassword: success");
+                                FirebaseUser user = FBRef.refAuth.getCurrentUser();
+                                tVMsg.setText("User logged successfuly\nUid: " + user.getUid());
+                            }
+                            else
+                            {
+                                Exception exp = task.getException();
+                                if (exp instanceof FirebaseAuthInvalidUserException)
+                                {
+                                    tVMsg.setText("Invalid email address.");
+                                }
+                                else if (exp instanceof FirebaseAuthWeakPasswordException)
+                                {
+                                    tVMsg.setText("Password too weak.");
+                                }
+                                else if (exp instanceof FirebaseAuthUserCollisionException)
+                                {
+                                    tVMsg.setText("User already exists.");
+                                }
+                                else if (exp instanceof FirebaseAuthInvalidCredentialsException)
+                                {
+                                    tVMsg.setText("General authentication failure.");
+                                }
+                                else if (exp instanceof FirebaseNetworkException)
+                                {
+                                    tVMsg.setText("Network error. Please check your connection.");
+                                }
+                                else
+                                {
                                     tVMsg.setText("An error occurred. Please try again later.");
                                 }
                             }

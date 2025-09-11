@@ -28,10 +28,16 @@
         android:inputType="textPassword" />
 
     <Button
-        android:id="@+id/btnCreateUser"
+        android:id="@+id/btnLoginUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Login" />
+
+    <Button
+        android:id="@+id/btnCreateUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign up" />
 
     <TextView
         android:id="@+id/tVMsg"
